@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/x-icon" href="logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cliente Dashboard - Controle de Pragas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #2C786C;
+            color: white;
+            position: fixed;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            text-align: center;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 12px;
+            margin: 10px 0;
+            background: #225F55;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .sidebar ul li:hover {
+            background: #1C4E45;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            width: 100%;
+        }
+        .tabs button {
+            margin-right: 10px;
+            padding: 10px;
+            background: #2C786C;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tabs button:hover {
+            background: #1C4E45;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:disabled, select:disabled {
+            background: #e9e9e9;
+        }
+        input:focus, select:focus {
+            border: 1px solid #2C786C;
+            box-shadow: 0 0 8px rgba(44, 120, 108, 0.6);
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar">
+    <h2>Controle de Pragas</h2>
+    <ul>
+        <li onclick="window.location.href='dashboard.html'">🏠 Dashboard</li>
+        <li onclick="window.location.href='clientes.html'">🏢 Clientes</li>
+        <li onclick="window.location.href='servicos.html'">🛠 Serviços</li>
+        <li onclick="window.location.href='configuracoes.html'">⚙ Configurações</li>
+        <li onclick="logout()">🚪 Sair</li>
+    </ul>
+</div>
+<div class="content">
+    <h1>Dashboard do Cliente</h1>
+    <div class="tabs">
+        <button onclick="openTab('informacoes')">📄 Informações Gerais</button>
+        <button onclick="openTab('endereco')">🏠 Endereço</button>
+        <button onclick="openTab('contato')">📞 Contato</button>
+        <button onclick="openTab('faturamento')">💰 Faturamento</button>
+    </div>
+
+    <div id="informacoes" class="tab-content active">
+        <h3>Informações Gerais</h3>
+        <label>ID:</label>
+        <input id="clienteId" disabled>
+        <label>Nome:</label>
+        <input id="clienteNome" disabled>
+        <label>CNPJ/CPF:</label>
+        <input id="clienteCnpjCpf" disabled>
+        <label>Tipo de Contrato:</label>
+        <select id="clienteTipoContrato" disabled>
+            <option value="Fixo">Fixo</option>
+            <option value="Avulso">Avulso</option>
+        </select>
+        <label>Data de Início:</label>
+        <input type="date" id="clienteDataInicio" disabled>
+    </div>
+
+    <button class="btn" onclick="habilitarEdicao()">✏️ Editar</button>
+    <button id="btnSalvar" class="btn" style="display:none;" onclick="salvarEdicao()">💾 Salvar</button>
+    <button id="btnCancelar" class="btn" style="display:none;" onclick="cancelarEdicao()">❌ Cancelar</button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const idCliente = urlParams.get("id");
+
+        if (idCliente) {
+            fetch(`http://localhost:8081/clientes/${idCliente}`)
+                .then(response => response.json())
+                .then(cliente => {
+                    document.getElementById("clienteId").value = cliente.idCliente;
+                    document.getElementById("clienteNome").value = cliente.nome;
+                    document.getElementById("clienteCnpjCpf").value = cliente.cnpjcpf;
+                    document.getElementById("clienteTipoContrato").value = cliente.tipoContrato;
+                    document.getElementById("clienteDataInicio").value = cliente.dataInicio;
+                })
+                .catch(error => console.error("Erro ao carregar cliente:", error));
+        }
+    });
+
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function habilitarEdicao() {
+        document.querySelectorAll("input, select").forEach(input => input.disabled = false);
+        document.getElementById("btnSalvar").style.display = "inline-block";
+        document.getElementById("btnCancelar").style.display = "inline-block";
+    }
+
+    function cancelarEdicao() {
+        location.reload();
+    }
+
+    function logout() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    }
+</script>
+</body>
+</html>

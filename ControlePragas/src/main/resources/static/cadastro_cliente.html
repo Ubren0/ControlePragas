@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <link rel="icon" type="image/x-icon" href="logo.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Cliente - Controle de Pragas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: #2C786C;
+            color: white;
+            position: fixed;
+            padding: 20px;
+        }
+        .sidebar h2 {
+            text-align: center;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+        .sidebar ul li {
+            padding: 12px;
+            margin: 10px 0;
+            background: #225F55;
+            cursor: pointer;
+            text-align: center;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .sidebar ul li:hover {
+            background: #1C4E45;
+        }
+
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+            width: 100%;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-salvar {
+            background: #2C786C;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .btn-salvar:hover {
+            background: #1C4E45;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Controle de Pragas</h2>
+    <ul>
+        <li onclick="window.location.href='dashboard.html'">🏠 Dashboard</li>
+        <li onclick="window.location.href='clientes.html'">🏢 Clientes</li>
+        <li onclick="window.location.href='servicos.html'">🛠 Serviços</li>
+        <li onclick="window.location.href='configuracoes.html'">⚙ Configurações</li>
+        <li onclick="logout()">🚪 Sair</li>
+    </ul>
+</div>
+
+<div class="content">
+    <h1>Cadastro de Cliente</h1>
+    <div class="card">
+        <h3>📝 Preencha os dados do Cliente</h3>
+        <form id="formCadastro">
+            <div class="input-group">
+                <label for="cnpjcpf">CNPJ/CPF *</label>
+                <input type="text" id="cnpjcpf" name="cnpjcpf" required>
+            </div>
+            <div class="input-group">
+                <label for="nome">Nome *</label>
+                <input type="text" id="nome" name="nome" required>
+            </div>
+            <div class="input-group">
+                <label for="telefone">Telefone</label>
+                <input type="text" id="telefone" name="telefone">
+            </div>
+            <div class="input-group">
+                <label for="email">E-mail</label>
+                <input type="email" id="email" name="email">
+            </div>
+            <button type="submit" class="btn-salvar">💾 Salvar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("formCadastro").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const cnpjcpf = document.getElementById("cnpjcpf").value.trim();
+            if (!cnpjcpf) {
+                alert("O campo CNPJ/CPF é obrigatório!");
+                return;
+            }
+
+            const cliente = {
+                cnpjcpf: cnpjcpf,
+                nome: document.getElementById("nome").value.trim(),
+                telefone: document.getElementById("telefone").value.trim(),
+                email: document.getElementById("email").value.trim()
+            };
+
+            console.log(cliente);
+
+            fetch("http://localhost:8081/clientes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(cliente)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Erro ao cadastrar cliente");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    alert("Cliente cadastrado com sucesso!");
+                    window.location.href = "clientes.html";
+                })
+                .catch(error => alert(error.message));
+        });
+    });
+
+    function logout() {
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>
